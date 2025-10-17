@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "author": "Mat Teague",
   "bin": {
-    "greenhouse": "./bin/run.js"
+    "greenhouse": "./bin/run.js",
+    "ghp": "./bin/run.js"
   },
   "bugs": "https://github.com/YewTreeWeb/greenhouse/issues",
   "dependencies": {
