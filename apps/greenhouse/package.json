@@ -10,7 +10,10 @@
   "dependencies": {
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
-    "@oclif/plugin-plugins": "^5"
+    "@oclif/plugin-plugins": "^5",
+    "clack": "^0.1.0",
+    "execa": "^9.6.0",
+    "ora": "^9.0.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
