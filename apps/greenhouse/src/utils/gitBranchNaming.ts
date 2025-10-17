@@ -1,4 +1,4 @@
-import {isProtectedBranch} from './branches.js'
+import {isProtectedBranch} from './gitBranches.js'
 
 export type BranchType = 'hotfix' | 'rch'
 
