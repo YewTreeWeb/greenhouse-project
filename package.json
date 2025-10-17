@@ -1,0 +1,17 @@
+{
+    "name": "greenhouse",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "dev:cli": "pnpm --filter greenhouse dev",
+        "dev:dash": "pnpm --filter sunroom dev",
+        "build": "pnpm -r build",
+        "start": "pnpm --filter greenhouse start",
+        "start:dash": "pnpm --filter sunroom start",
+        "sunroom": "pnpm --filter sunroom start"
+    },
+    "devDependencies": {
+        "pnpm": "^10.18.3",
+        "typescript": "^5.9.3"
+    }
+}
