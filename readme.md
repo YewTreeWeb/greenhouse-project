@@ -31,9 +31,12 @@ The **Greenhouse ecosystem** includes standalone tools that can also run indepen
 
 ## 🧩 Installation
 
-### Option 1: via pnpm (recommended) or npm
+### Option 1: via pnpm (recommended), bun or npm
 ```bash
 pnpm install -g @greenhouse/cli
+```
+```bash
+bun install -g @greenhouse/cli
 ```
 ```bash
 npm install -g @greenhouse/cli
