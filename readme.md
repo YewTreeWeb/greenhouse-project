@@ -15,8 +15,8 @@ Each tool in the ecosystem can be run **standalone** or **under the `greenhouse`
 
 | Command | Role | Status |
 |---|---|---|
-| `terrarium` | Bootstrap a fresh Mac or Linux machine — Nix-first setup, Homebrew (macOS), dotfiles, SSH, git config | ![Planned](https://img.shields.io/badge/-planned-lightgrey?style=flat-square) |
-| `sprout` | Scaffold a new project (Vite, Astro, Laravel 12) with opinionated defaults and official starter kits | ![Planned](https://img.shields.io/badge/-planned-lightgrey?style=flat-square) |
+| `terrarium` | Bootstrap a fresh Mac or Linux machine — Nix-first setup, Homebrew (macOS), dotfiles, SSH, git config | ![WIP](https://img.shields.io/badge/-work%20in%20progress-orange?style=flat-square) |
+| `sprout` | Scaffold a new project (Vite, Astro, Laravel 12) with opinionated defaults and official starter kits | ![WIP](https://img.shields.io/badge/-work%20in%20progress-orange?style=flat-square) |
 | `cultivate` | Apply dev configs to an existing project (ESLint, Prettier, Tailwind, Stylelint) | ![Planned](https://img.shields.io/badge/-planned-lightgrey?style=flat-square) |
 | `planter` | Restore a project from a Seedbank snapshot — the replant side of the backup/restore workflow | ![Planned](https://img.shields.io/badge/-planned-lightgrey?style=flat-square) |
 | `branch` | Git management — simplified branch creation, switching, deletion with stash safety | ![Planned](https://img.shields.io/badge/-planned-lightgrey?style=flat-square) |
