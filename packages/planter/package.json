@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/planter",
 	"description": "Restore a project from a Seedbank snapshot \u2014 the replant side of the backup/restore workflow",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"planter": "./bin/run.js"

@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/gardener",
 	"description": "AI-powered project intelligence \u2014 watches all projects, surfaces proactive insights, answers natural language queries via local Ollama",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"gardener": "./bin/run.js"

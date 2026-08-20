@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/branch",
 	"description": "Git branch management",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"branch": "./bin/run.js"

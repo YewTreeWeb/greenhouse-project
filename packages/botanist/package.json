@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/botanist",
 	"description": "Greenhouse environment health check, inspired by flutter doctor",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"botanist": "./bin/run.js"

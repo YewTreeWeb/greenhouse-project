@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/terrarium",
 	"description": "Bootstrap a fresh Mac or Linux machine \u2014 Nix-first setup, Homebrew (macOS), dotfiles, SSH, git config",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"terrarium": "./bin/run.js"
