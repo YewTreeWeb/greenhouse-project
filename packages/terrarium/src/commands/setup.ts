@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import {
 	cancel,
 	confirm,
@@ -8,6 +10,7 @@ import {
 	multiselect,
 	outro,
 	select,
+	tasks,
 } from "@clack/prompts";
 import { runCommand } from "@greenhouse/shared";
 import { Args, Command, Flags } from "@oclif/core";
@@ -88,6 +91,39 @@ export default class Setup extends Command {
 		}, 60_000).unref();
 
 		log.success("Password cached for this session.");
+	}
+
+	private async directorySetup(
+		dir: string | string[],
+		useSudo = false,
+	): Promise<string> {
+		const dirCheck = async (d: string) => {
+			const target = d.startsWith("~") ? d.replace("~", homedir()) : d;
+
+			if (existsSync(target)) {
+				return `Directory ${target} already exists, skipping.`;
+			}
+
+			if (this.isDryRun) {
+				return `Directory ${target} would be created (dry run).`;
+			}
+
+			const mkdir = useSudo
+				? await runCommand("sudo", ["mkdir", "-p", target], {
+						stdio: "inherit",
+					})
+				: await runCommand("mkdir", ["-p", target], { stdio: "inherit" });
+
+			if (!mkdir.ok) {
+				return `Failed to create directory: ${mkdir.error}`;
+			}
+
+			return `Directory ${target} created successfully.`;
+		};
+
+		const dirs = Array.isArray(dir) ? dir : [dir];
+		const results = await Promise.all(dirs.map(dirCheck));
+		return results.join("\n");
 	}
 
 	public async run(): Promise<void> {
@@ -251,7 +287,24 @@ export default class Setup extends Command {
 		await this.cacheSudo();
 		try {
 			log.message("Starting setup tasks...");
-			// await tasks([{}]);
+			await tasks([
+				{
+					title: "Creating core directories",
+					task: async () => {
+						const dirs = ["/usr/local", "/usr/local/bin", "/usr/local/sbin"];
+						const result = await this.directorySetup(dirs, true);
+						return result;
+					},
+				},
+				{
+					title: "Creating developer directories",
+					task: async () => {
+						const dirs = ["~/Sites", "~/Developer"];
+						const result = await this.directorySetup(dirs);
+						return result;
+					},
+				},
+			]);
 		} finally {
 			clearInterval(this.sudoKeepAlive);
 		}

@@ -1,7 +1,6 @@
 import type { Command } from "@oclif/core";
 
-export function failOrExit(
-	job: "fail" | "exit",
+export function failAndExit(
 	command: Command,
 	error: Error | unknown,
 	debug: boolean,
@@ -10,11 +9,6 @@ export function failOrExit(
 	if (debug) {
 		if (error instanceof Error) console.error(error);
 		command.log(`Debug: ${err}`);
-		return;
-	}
-
-	if (job === "fail") {
-		command.log(err);
 		return;
 	}
 
