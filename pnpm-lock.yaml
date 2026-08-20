@@ -601,6 +601,9 @@ importers:
 
   packages/terrarium:
     dependencies:
+      '@clack/prompts':
+        specifier: ^1.7.0
+        version: 1.7.0
       '@oclif/core':
         specifier: ^4
         version: 4.5.6

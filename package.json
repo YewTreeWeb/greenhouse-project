@@ -10,7 +10,8 @@
 		"start": "pnpm --filter greenhouse start",
 		"start:dash": "pnpm --filter sunroom start",
 		"sunroom": "pnpm --filter sunroom start",
-		"lint": "biome check .",
+		"lint": "biome check . && pnpm lint:sh",
+		"lint:sh": "find . -name '*.sh' -not -path '*/node_modules/*' -not -path '*/.husky/*' -exec shellcheck {} +",
 		"format": "biome format --write .",
 		"commit": "cz",
 		"prepare": "husky",
@@ -40,6 +41,9 @@
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx,json,jsonc}": [
 			"biome check --write --no-errors-on-unmatched"
+		],
+		"*.sh": [
+			"shellcheck"
 		]
 	}
 }

@@ -1,12 +1,225 @@
-import { Command } from "@oclif/core";
+import {
+	cancel,
+	confirm,
+	group,
+	intro,
+	isCancel,
+	multiselect,
+	select,
+} from "@clack/prompts";
+import { Args, Command, Flags } from "@oclif/core";
+import type { FlagInput } from "@oclif/core/interfaces";
 
 export default class Setup extends Command {
 	static override description =
 		"Bootstrap a fresh Mac or Linux machine — Nix-first setup, Homebrew (macOS), dotfiles, SSH, git config";
 
-	static override examples = ["<%= config.bin %>"];
+	static override examples = ["terrarium setup", "greenhouse setup"];
+
+	static override args = {
+		platform: Args.string({
+			description: "The platform to setup (macOS or Linux)",
+			options: ["macos", "linux"],
+			required: true,
+		}),
+	};
+
+	static override flags: FlagInput<{ [flag: string]: any }> = {
+		shell: Flags.string({
+			char: "s",
+			description: "The shell environment to use",
+			options: ["bash", "zsh", "fish"],
+		}),
+		node: Flags.string({
+			description: "The Node.js version to install",
+			default: "lts",
+		}),
+		ruby: Flags.string({
+			description: "The Ruby version to install",
+			default: "latest",
+		}),
+		php: Flags.string({
+			description: "The PHP version to install",
+			default: "latest",
+		}),
+		terminal: Flags.string({
+			description: "The terminal emulator to use",
+			options: ["iterm", "kitty", "alacritty", "hyper", "ghostty"],
+		}),
+		dryRun: Flags.boolean({
+			char: "d",
+			description: "Simulate creation without applying changes",
+			default: false,
+		}),
+		debug: Flags.boolean({
+			char: "D",
+			description: "Enable debug logging",
+			default: false,
+		}),
+		default: Flags.boolean({
+			description: "Use default settings for setup",
+			default: false,
+		}),
+	};
+
+	private isDryRun = false;
+	private isDebug = false;
+	private devMode = process.env.NODE_ENV === "development";
 
 	public async run(): Promise<void> {
-		this.log("Setup — work in progress");
+		const { args, flags } = await this.parse(Setup);
+		const { platform } = args;
+
+		this.isDryRun = flags.dryRun;
+		this.isDebug = flags.debug || this.devMode;
+		const introMsg = "Starting setup process.";
+
+		const defaultSettings = flags.default
+			? {
+					shell: "zsh",
+					terminal: "hyper",
+					launchers: ["raycast"],
+					node: { version: "lts", pkgManager: "pnpm" },
+					ruby: { version: "latest", gemManager: "bundler" },
+					php: { version: "latest", phpManager: "composer" },
+				}
+			: null;
+
+		if (this.devMode) {
+			intro(`${introMsg} (Development Mode)...`);
+		} else {
+			intro(`${introMsg}...`);
+		}
+
+		const shell =
+			flags.shell ||
+			(await select({
+				message: "Select your preferred shell environment",
+				options: [
+					{ value: "bash", label: "Bash" },
+					{ value: "zsh", label: "Zsh" },
+					{ value: "fish", label: "Fish" },
+				],
+				maxItems: 3,
+			}));
+
+		const terminal =
+			flags.terminal ||
+			(await select({
+				message: "Select your preferred terminal emulator",
+				options: [
+					{ value: "iterm", label: "iTerm" },
+					{ value: "kitty", label: "Kitty" },
+					{ value: "alacritty", label: "Alacritty" },
+					{ value: "hyper", label: "Hyper" },
+					{ value: "ghostty", label: "Ghostty" },
+				],
+				maxItems: 5,
+			}));
+
+		const launcher =
+			platform !== "darwin"
+				? []
+				: await multiselect({
+						message: "Select the launchers you want to install",
+						options: [
+							{ value: "raycast", label: "Raycast" },
+							{ value: "alfred", label: "Alfred" },
+						],
+						maxItems: 2,
+					});
+
+		const nodeGroup = await group({
+			node: () =>
+				select({
+					message: "Select the Node.js version to install",
+					options: [
+						{ value: "latest", label: "Latest" },
+						{ value: "lts", label: "LTS" },
+					],
+				}),
+			pkgManager: () =>
+				select({
+					message: "Select the package manager to use",
+					options: [
+						{ value: "npm", label: "npm" },
+						{ value: "yarn", label: "Yarn" },
+						{ value: "pnpm", label: "pnpm" },
+						{ value: "bun", label: "Bun" },
+					],
+				}),
+		});
+
+		const rubyGroup = await group({
+			ruby: () =>
+				select({
+					message: "Select the Ruby version to install",
+					options: [
+						{ value: "latest", label: "Latest" },
+						{ value: "3.2", label: "3.2" },
+						{ value: "3.1", label: "3.1" },
+						{ value: "3.0", label: "3.0" },
+						{ value: "2.7", label: "2.7" },
+					],
+				}),
+			gemManager: () =>
+				select({
+					message: "Select the gem manager to use",
+					options: [
+						{ value: "bundler", label: "Bundler" },
+						{ value: "rubygems", label: "RubyGems" },
+					],
+				}),
+		});
+
+		const phpGroup = await group({
+			php: () =>
+				select({
+					message: "Select the PHP version to install",
+					options: [
+						{ value: "latest", label: "Latest" },
+						{ value: "8.2", label: "8.2" },
+						{ value: "8.1", label: "8.1" },
+						{ value: "8.0", label: "8.0" },
+						{ value: "7.4", label: "7.4" },
+					],
+				}),
+			phpManager: () =>
+				select({
+					message: "Select the PHP manager to use",
+					options: [
+						{ value: "composer", label: "Composer" },
+						{ value: "pecl", label: "PECL" },
+					],
+				}),
+		});
+
+		const confirmation = await confirm({
+			message: "Do you want to proceed with the setup?",
+			initialValue: true,
+		});
+
+		if (
+			isCancel(shell) ||
+			isCancel(terminal) ||
+			isCancel(launcher) ||
+			isCancel(phpGroup) ||
+			isCancel(rubyGroup) ||
+			isCancel(nodeGroup) ||
+			isCancel(confirmation)
+		) {
+			cancel("Setup process canceled by user.");
+		}
+
+		if (this.isDebug) {
+			console.log("Parsed arguments:", args);
+			console.log("Parsed flags:", flags);
+			console.log("Selected shell:", shell);
+			console.log("Selected terminal:", terminal);
+			console.log("Selected launchers:", launcher);
+			console.log("Selected node choices:", nodeGroup);
+			console.log("Selected ruby choices:", rubyGroup);
+			console.log("Selected php choices:", phpGroup);
+		}
 	}
 }
