@@ -1,6 +1,6 @@
 {
 	"name": "@greenhouse/gardener",
-	"description": "AI-powered project intelligence — watches all projects, surfaces proactive insights, answers natural language queries via local Ollama",
+	"description": "AI-powered project intelligence \u2014 watches all projects, surfaces proactive insights, answers natural language queries via local Ollama",
 	"version": "0.0.0",
 	"author": "Mat Teague",
 	"bin": {
@@ -54,5 +54,9 @@
 		"prepack": "oclif manifest && oclif readme",
 		"start": "./bin/run.js",
 		"test": "mocha --forbid-only \"test/**/*.test.ts\""
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://verdaccio.teamteaguehomelab.uk/"
 	}
 }

@@ -54,5 +54,9 @@
 		"prepack": "oclif manifest && oclif readme",
 		"start": "./bin/run.js",
 		"test": "mocha --forbid-only \"test/**/*.test.ts\""
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://verdaccio.teamteaguehomelab.uk/"
 	}
 }
