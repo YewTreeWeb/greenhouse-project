@@ -18,6 +18,9 @@
     "**/.svelte-kit/**",
     "**/oclif.manifest.json"
   ],
+  "ignoreDependencies": [
+    "cz-git" // only referenced via config.commitizen.path string, invisible to static analysis
+  ],
   "duplicates": {
     // Hide pair-only clones; focus on widespread copy-paste
     // worth refactoring. Lower to 2 to report every duplicate pair.
