@@ -4,8 +4,11 @@ import {
 	group,
 	intro,
 	isCancel,
+	log,
 	multiselect,
+	outro,
 	select,
+	tasks,
 } from "@clack/prompts";
 import { Args, Command, Flags } from "@oclif/core";
 import type { FlagInput } from "@oclif/core/interfaces";
@@ -66,6 +69,11 @@ export default class Setup extends Command {
 	private isDebug = false;
 	private devMode = process.env.NODE_ENV === "development";
 
+	private bail(message: string): never {
+		cancel(message);
+		this.exit(1);
+	}
+
 	public async run(): Promise<void> {
 		const { args, flags } = await this.parse(Setup);
 		const { platform } = args;
@@ -102,6 +110,7 @@ export default class Setup extends Command {
 				],
 				maxItems: 3,
 			}));
+		if (isCancel(shell)) this.bail("Setup canceled by user.");
 
 		const terminal =
 			flags.terminal ||
@@ -116,9 +125,10 @@ export default class Setup extends Command {
 				],
 				maxItems: 5,
 			}));
+		if (isCancel(terminal)) this.bail("Setup canceled by user.");
 
 		const launcher =
-			platform !== "darwin"
+			platform !== "macos"
 				? []
 				: await multiselect({
 						message: "Select the launchers you want to install",
@@ -128,88 +138,88 @@ export default class Setup extends Command {
 						],
 						maxItems: 2,
 					});
+		if (isCancel(launcher)) this.bail("Setup canceled by user.");
 
-		const nodeGroup = await group({
-			node: () =>
-				select({
-					message: "Select the Node.js version to install",
-					options: [
-						{ value: "latest", label: "Latest" },
-						{ value: "lts", label: "LTS" },
-					],
-				}),
-			pkgManager: () =>
-				select({
-					message: "Select the package manager to use",
-					options: [
-						{ value: "npm", label: "npm" },
-						{ value: "yarn", label: "Yarn" },
-						{ value: "pnpm", label: "pnpm" },
-						{ value: "bun", label: "Bun" },
-					],
-				}),
-		});
+		const nodeGroup = await group(
+			{
+				node: () =>
+					select({
+						message: "Select the Node.js version to install",
+						options: [
+							{ value: "latest", label: "Latest" },
+							{ value: "lts", label: "LTS" },
+						],
+					}),
+				pkgManager: () =>
+					select({
+						message: "Select the package manager to use",
+						options: [
+							{ value: "npm", label: "npm" },
+							{ value: "yarn", label: "Yarn" },
+							{ value: "pnpm", label: "pnpm" },
+							{ value: "bun", label: "Bun" },
+						],
+					}),
+			},
+			{ onCancel: () => this.bail("Setup canceled by user.") },
+		);
 
-		const rubyGroup = await group({
-			ruby: () =>
-				select({
-					message: "Select the Ruby version to install",
-					options: [
-						{ value: "latest", label: "Latest" },
-						{ value: "3.2", label: "3.2" },
-						{ value: "3.1", label: "3.1" },
-						{ value: "3.0", label: "3.0" },
-						{ value: "2.7", label: "2.7" },
-					],
-				}),
-			gemManager: () =>
-				select({
-					message: "Select the gem manager to use",
-					options: [
-						{ value: "bundler", label: "Bundler" },
-						{ value: "rubygems", label: "RubyGems" },
-					],
-				}),
-		});
+		const rubyGroup = await group(
+			{
+				ruby: () =>
+					select({
+						message: "Select the Ruby version to install",
+						options: [
+							{ value: "latest", label: "Latest" },
+							{ value: "3.2", label: "3.2" },
+							{ value: "3.1", label: "3.1" },
+							{ value: "3.0", label: "3.0" },
+							{ value: "2.7", label: "2.7" },
+						],
+					}),
+				gemManager: () =>
+					select({
+						message: "Select the gem manager to use",
+						options: [
+							{ value: "bundler", label: "Bundler" },
+							{ value: "rubygems", label: "RubyGems" },
+						],
+					}),
+			},
+			{ onCancel: () => this.bail("Setup canceled by user.") },
+		);
 
-		const phpGroup = await group({
-			php: () =>
-				select({
-					message: "Select the PHP version to install",
-					options: [
-						{ value: "latest", label: "Latest" },
-						{ value: "8.2", label: "8.2" },
-						{ value: "8.1", label: "8.1" },
-						{ value: "8.0", label: "8.0" },
-						{ value: "7.4", label: "7.4" },
-					],
-				}),
-			phpManager: () =>
-				select({
-					message: "Select the PHP manager to use",
-					options: [
-						{ value: "composer", label: "Composer" },
-						{ value: "pecl", label: "PECL" },
-					],
-				}),
-		});
+		const phpGroup = await group(
+			{
+				php: () =>
+					select({
+						message: "Select the PHP version to install",
+						options: [
+							{ value: "latest", label: "Latest" },
+							{ value: "8.2", label: "8.2" },
+							{ value: "8.1", label: "8.1" },
+							{ value: "8.0", label: "8.0" },
+							{ value: "7.4", label: "7.4" },
+						],
+					}),
+				phpManager: () =>
+					select({
+						message: "Select the PHP manager to use",
+						options: [
+							{ value: "composer", label: "Composer" },
+							{ value: "pecl", label: "PECL" },
+						],
+					}),
+			},
+			{ onCancel: () => this.bail("Setup canceled by user.") },
+		);
 
 		const confirmation = await confirm({
 			message: "Do you want to proceed with the setup?",
 			initialValue: true,
 		});
-
-		if (
-			isCancel(shell) ||
-			isCancel(terminal) ||
-			isCancel(launcher) ||
-			isCancel(phpGroup) ||
-			isCancel(rubyGroup) ||
-			isCancel(nodeGroup) ||
-			isCancel(confirmation)
-		) {
-			cancel("Setup process canceled by user.");
-		}
+		if (isCancel(confirmation)) this.bail("Setup canceled by user.");
+		if (!confirmation) this.bail("Setup aborted.");
 
 		if (this.isDebug) {
 			console.log("Parsed arguments:", args);
@@ -221,5 +231,10 @@ export default class Setup extends Command {
 			console.log("Selected ruby choices:", rubyGroup);
 			console.log("Selected php choices:", phpGroup);
 		}
+
+		log.message("Starting setup tasks...");
+		await tasks([{}]);
+
+		outro("Setup configuration collected.");
 	}
 }
