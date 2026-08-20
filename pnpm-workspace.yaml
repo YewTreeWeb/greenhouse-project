@@ -1,5 +1,15 @@
 packages:
   - "apps/*"
+allowBuilds:
+  '@tailwindcss/oxide': true
+  bufferutil: true
+  es5-ext: true
+  esbuild: true
+  unrs-resolver: true
+  utf-8-validate: true
+  yarn: true
+minimumReleaseAgeExclude:
+  - gitignore-init@1.0.0
 onlyBuiltDependencies:
   - esbuild
   - '@tailwindcss/oxide'
