@@ -3,40 +3,63 @@ name: Release
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    test:
+        runs-on: ubuntu-latest
+        container: node:lts
+        permissions:
+          contents: read
+          id-token: write
+          pull-requests: write
+          checks: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            - run: corepack enable && corepack prepare pnpm@11.16.0 --activate
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm build
+            - run: pnpm lint
+            - uses: fallow-rs/fallow@v3
+              with:
+                command: audit
+                production: true
+                format: human
 
-      - uses: pnpm/action-setup@v4
+    release:
+        needs: test
+        if: github.event_name == 'push'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
+        - uses: pnpm/action-setup@v4
 
-      - run: pnpm install --frozen-lockfile
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 22
+            cache: pnpm
 
-      - run: pnpm lint
+        - run: pnpm install --frozen-lockfile
+        - name: Configure registry auth
+          run: pnpm config set "//verdaccio.teamteaguehomelab.uk/:_authToken" "${{ secrets.NPM_TOKEN }}"
 
-      - name: Configure registry auth
-        run: pnpm config set "//verdaccio.teamteaguehomelab.uk/:_authToken" "${{ secrets.NPM_TOKEN }}"
-
-      - name: Create release PR or publish to Verdaccio
-        uses: changesets/action@v1
-        with:
-          publish: pnpm release
-          version: pnpm version-packages
-          commit: "chore: version packages"
-          title: "chore: version packages"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - name: Create release PR or publish to Verdaccio
+          uses: changesets/action@v1
+          with:
+            publish: pnpm release
+            version: pnpm version-packages
+            commit: "chore: version packages"
+            title: "chore: version packages"
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

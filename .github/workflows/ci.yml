@@ -4,22 +4,22 @@ on:
   push:
     branches-ignore: [main]
   pull_request:
+    branches-ignore: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm lint
-
+      - uses: fallow-rs/fallow@v3
+        with:
+            command: audit
+            format: human
       - run: pnpm build
