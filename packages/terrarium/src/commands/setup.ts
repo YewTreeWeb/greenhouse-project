@@ -8,8 +8,8 @@ import {
 	multiselect,
 	outro,
 	select,
-	tasks,
 } from "@clack/prompts";
+import { runCommand } from "@greenhouse/shared";
 import { Args, Command, Flags } from "@oclif/core";
 import type { FlagInput } from "@oclif/core/interfaces";
 
@@ -69,9 +69,25 @@ export default class Setup extends Command {
 	private isDebug = false;
 	private devMode = process.env.NODE_ENV === "development";
 
+	private sudoKeepAlive?: NodeJS.Timeout;
+
 	private bail(message: string): never {
 		cancel(message);
 		this.exit(1);
+	}
+
+	private async cacheSudo(): Promise<void> {
+		const result = await runCommand("sudo", ["-v"], { stdio: "inherit" });
+		if (!result.ok) {
+			log.error(result.error);
+			this.bail("Administrator password required to continue.");
+		}
+
+		this.sudoKeepAlive = setInterval(() => {
+			void runCommand("sudo", ["-n", "true"]);
+		}, 60_000).unref();
+
+		log.success("Password cached for this session.");
 	}
 
 	public async run(): Promise<void> {
@@ -232,8 +248,13 @@ export default class Setup extends Command {
 			console.log("Selected php choices:", phpGroup);
 		}
 
-		log.message("Starting setup tasks...");
-		await tasks([{}]);
+		await this.cacheSudo();
+		try {
+			log.message("Starting setup tasks...");
+			// await tasks([{}]);
+		} finally {
+			clearInterval(this.sudoKeepAlive);
+		}
 
 		outro("Setup configuration collected.");
 	}

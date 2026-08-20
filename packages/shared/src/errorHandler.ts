@@ -1,18 +1,24 @@
 import type { Command } from "@oclif/core";
 
 export function failOrExit(
+	job: "fail" | "exit",
 	command: Command,
 	error: Error | unknown,
 	debug: boolean,
-): never {
+) {
 	const err = formatErrorMsg(error);
 	if (debug) {
 		if (error instanceof Error) console.error(error);
-		command.error(err);
-	} else {
-		command.warn(err);
-		command.exit(1);
+		command.log(`Debug: ${err}`);
+		return;
 	}
+
+	if (job === "fail") {
+		command.log(err);
+		return;
+	}
+
+	command.error(err);
 }
 
 export function formatErrorMsg(error: Error | unknown): string {

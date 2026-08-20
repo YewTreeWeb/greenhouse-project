@@ -32,6 +32,7 @@
 	},
 	"dependencies": {
 		"@clack/prompts": "^1.7.0",
+		"@greenhouse/shared": "workspace:*",
 		"@oclif/core": "^4",
 		"execa": "^9.6.0",
 		"ora": "^9.0.0"

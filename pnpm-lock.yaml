@@ -604,6 +604,9 @@ importers:
       '@clack/prompts':
         specifier: ^1.7.0
         version: 1.7.0
+      '@greenhouse/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@oclif/core':
         specifier: ^4
         version: 4.5.6
