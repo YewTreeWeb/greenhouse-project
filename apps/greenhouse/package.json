@@ -1,7 +1,7 @@
 {
 	"name": "greenhouse",
 	"description": "The Greenhouse CLI for setting up your Linux and macOS dev environments.",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"greenhouse": "./bin/run.js",

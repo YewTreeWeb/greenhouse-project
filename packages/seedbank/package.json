@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/seedbank",
 	"description": "Project snapshots + system manifest backups",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"seedbank": "./bin/run.js"

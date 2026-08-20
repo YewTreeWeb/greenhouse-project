@@ -1,7 +1,7 @@
 {
 	"name": "@greenhouse/orchard",
 	"description": "Batch operations across projects",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "Mat Teague",
 	"bin": {
 		"orchard": "./bin/run.js"
