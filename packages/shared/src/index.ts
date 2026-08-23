@@ -1,3 +1,4 @@
+export * from "./cacheSudo.js";
 export * from "./createDockerFile.js";
 export * from "./emoji.js";
 export * from "./errorHandler.js";

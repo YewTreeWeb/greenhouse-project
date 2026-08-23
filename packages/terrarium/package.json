@@ -43,6 +43,7 @@
 		"@types/node": "^18.19.130",
 		"mocha": "^10",
 		"oclif": "^4",
+		"oxlint": "^1.79.0",
 		"shx": "^0.3.3",
 		"ts-node": "^10",
 		"typescript": "^5"

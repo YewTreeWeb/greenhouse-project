@@ -12,7 +12,7 @@ import {
 	select,
 	tasks,
 } from "@clack/prompts";
-import { runCommand } from "@greenhouse/shared";
+import { cacheSudo, runCommand } from "@greenhouse/shared";
 import { Args, Command, Flags } from "@oclif/core";
 import type { FlagInput } from "@oclif/core/interfaces";
 
@@ -77,20 +77,6 @@ export default class Setup extends Command {
 	private bail(message: string): never {
 		cancel(message);
 		this.exit(1);
-	}
-
-	private async cacheSudo(): Promise<void> {
-		const result = await runCommand("sudo", ["-v"], { stdio: "inherit" });
-		if (!result.ok) {
-			log.error(result.error);
-			this.bail("Administrator password required to continue.");
-		}
-
-		this.sudoKeepAlive = setInterval(() => {
-			void runCommand("sudo", ["-n", "true"]);
-		}, 60_000).unref();
-
-		log.success("Password cached for this session.");
 	}
 
 	private async directorySetup(
@@ -192,6 +178,28 @@ export default class Setup extends Command {
 					});
 		if (isCancel(launcher)) this.bail("Setup canceled by user.");
 
+		const nixPackageManager =
+			platform === "macos" ? "Nix will install Homebrew & Mise" : "";
+		const installer = await select({
+			message: "Select the installer to use for setup",
+			options: [
+				{ value: "nix", label: "Nix", hint: nixPackageManager },
+				{ value: "homebrew", label: "Homebrew" },
+				{ value: "mise", label: "Mise" },
+				{
+					value: "homebrew-mise",
+					label: "Homebrew + Mise",
+					hint: "Homebrew and Mise will be used as your system package managers",
+				},
+				{
+					value: "manual",
+					label: "Manual installation",
+					hint: "You will need to install packages managers manually",
+				},
+			],
+		});
+		if (isCancel(installer)) this.bail("Setup canceled by user.");
+
 		const nodeGroup = await group(
 			{
 				node: () =>
@@ -210,6 +218,11 @@ export default class Setup extends Command {
 							{ value: "yarn", label: "Yarn" },
 							{ value: "pnpm", label: "pnpm" },
 							{ value: "bun", label: "Bun" },
+							{
+								value: "nub",
+								label: "Nub",
+								hint: "Nub will also be used as your node version manager",
+							},
 						],
 					}),
 			},
@@ -284,7 +297,15 @@ export default class Setup extends Command {
 			console.log("Selected php choices:", phpGroup);
 		}
 
-		await this.cacheSudo();
+		const { keepAlive, msg } = await cacheSudo();
+		this.sudoKeepAlive = keepAlive;
+
+		if (msg.type === "error") {
+			log.error(msg.text);
+		} else {
+			log.success(msg.text);
+		}
+
 		try {
 			log.message("Starting setup tasks...");
 			await tasks([
