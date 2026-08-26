@@ -8,7 +8,7 @@ export const cacheSudo = async (): Promise<{
 	const result = await runCommand("sudo", ["-v"], { stdio: "inherit" });
 
 	if (!result.ok) {
-		return { msg: { type: "error", text: formatErrorMsg(result.error) } };
+		return { msg: { text: formatErrorMsg(result.error), type: "error" } };
 	}
 
 	const sudoKeepAlive = setInterval(() => {
@@ -17,6 +17,6 @@ export const cacheSudo = async (): Promise<{
 
 	return {
 		keepAlive: sudoKeepAlive,
-		msg: { type: "success", text: "Password cached for this session." },
+		msg: { text: "Password cached for this session.", type: "success" },
 	};
 };

@@ -1,0 +1,21 @@
+[tools]
+gh = "latest"
+herdr = "latest"
+lazygit = "latest"
+mas = "latest"
+mkcert = "latest"
+node = "lts"
+nub = { version = "latest", allow_builds = ["@nubjs/nub"] }
+pnpm = "latest"
+ruby = "latest"
+rust = "latest"
+shellcheck = "latest"
+uv = "latest"
+yarn = "latest"
+zoxide = "latest"
+[tasks."brew:dump"]
+description = "Dump installed packages to Brewfile"
+run = "brew bundle dump --force"
+[tasks."brew:cleanup"]
+description = "If you want your current system configuration to match your brewfile"
+run = "brew bundle --force cleanup"

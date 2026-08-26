@@ -1,56 +1,61 @@
 {
-	"name": "greenhouse",
-	"private": true,
-	"version": "0.0.0",
-	"packageManager": "pnpm@11.16.0",
-	"scripts": {
-		"dev:cli": "pnpm --filter greenhouse dev",
-		"dev:dash": "pnpm --filter sunroom dev",
-		"build": "pnpm -r build",
-		"start": "pnpm --filter greenhouse start",
-		"start:dash": "pnpm --filter sunroom start",
-		"sunroom": "pnpm --filter sunroom start",
-		"lint:sh": "find . -name '*.sh' -not -path '*/node_modules/*' -not -path '*/.husky/*' -exec shellcheck {} +",
-		"lint:biome": "biome check . --write --no-errors-on-unmatched",
-		"lint:oxlint": "oxlint -c oxlint.config.ts --fix",
-		"lint": "pnpm lint:biome && pnpm lint:oxlint && pnpm lint:sh",
-		"format": "biome format --write .",
-		"commit": "cz",
-		"prepare": "husky",
-		"changeset": "changeset",
-		"version-packages": "changeset version",
-		"release": "pnpm build && changeset publish"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.5.9",
-		"@changesets/changelog-github": "^1.0.0",
-		"@changesets/cli": "^3.0.1",
-		"@commitlint/cli": "^21.2.2",
-		"@commitlint/config-conventional": "^21.2.2",
-		"@oxlint/plugins": "1.80.0",
-		"@types/node": "^26.2.0",
-		"commitizen": "^4.3.2",
-		"cz-git": "^1.13.2",
-		"fallow": "^3.14.0",
-		"husky": "^9.1.7",
-		"lint-staged": "^17.3.0",
-		"oxlint": "1.80.0",
-		"pnpm": "^10.18.3",
-		"typescript": "^5.9.3"
-	},
-	"config": {
-		"commitizen": {
-			"path": "cz-git"
-		}
-	},
-	"lint-staged": {
-		"*.{js,jsx,ts,tsx,json,jsonc}": [
-			"biome check --write --no-errors-on-unmatched",
-			"pnpm lint:oxlint",
-			"pnpm format"
-		],
-		"*.sh": [
-			"shellcheck"
-		]
-	}
+  "name": "greenhouse",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "changeset": "changeset",
+    "check": "ultracite check",
+    "commit": "cz",
+    "dev:cli": "pnpm --filter greenhouse dev",
+    "dev:dash": "pnpm --filter sunroom dev",
+    "fix": "ultracite fix",
+    "format": "biome format --write .",
+    "lint": "pnpm fix && pnpm lint:biome && pnpm lint:oxlint && pnpm lint:sh",
+    "lint:biome": "biome check . --write --no-errors-on-unmatched",
+    "lint:oxlint": "oxlint -c oxlint.config.ts --fix",
+    "lint:sh": "find . -name '*.sh' -not -path '*/node_modules/*' -not -path '*/.husky/*' -exec shellcheck {} +",
+    "prepare": "husky",
+    "release": "pnpm build && changeset publish",
+    "start": "pnpm --filter greenhouse start",
+    "start:dash": "pnpm --filter sunroom start",
+    "sunroom": "pnpm --filter sunroom start",
+    "version-packages": "changeset version"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,jsonc}": [
+      "biome check --write --no-errors-on-unmatched",
+      "pnpm lint:oxlint",
+      "pnpm format"
+    ],
+    "*.sh": [
+      "shellcheck"
+    ],
+    "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [
+      "pnpm dlx ultracite fix"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-git"
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.9",
+    "@changesets/changelog-github": "^1.0.0",
+    "@changesets/cli": "^3.0.1",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "@oxlint/plugins": "1.80.0",
+    "@types/node": "^26.2.0",
+    "commitizen": "^4.3.2",
+    "cz-git": "^1.13.2",
+    "fallow": "^3.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.3.0",
+    "pnpm": "^10.18.3",
+    "typescript": "^5.9.3",
+    "ultracite": "7.10.6"
+  },
+  "packageManager": "pnpm@11.16.0"
 }

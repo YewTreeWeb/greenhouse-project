@@ -1,0 +1,6 @@
+alecaddd/awps-cli
+dealerdirect/phpcodesniffer-composer-installer
+laravel/installer
+laravel/valet
+roave/security-advisories:dev-master
+squizlabs/php_codesniffer=*
