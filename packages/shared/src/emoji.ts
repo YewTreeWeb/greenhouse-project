@@ -24,10 +24,16 @@ export function logWithEmoji(emoji: keyof typeof emojis, message: string) {
 	console.log(`${emojis[emoji]}  ${message}`);
 }
 
+const plantEmojiKeys = [
+	"bloom",
+	"bud",
+	"grow",
+	"seed",
+	"sprout",
+	"water",
+] as const satisfies readonly (keyof typeof emojis)[];
+
 export function randomPlantEmoji() {
-	const keys = Object.keys(emojis).filter((k) =>
-		["bloom", "bud", "grow", "seed", "sprout", "water"].includes(k),
-	);
-	const random = keys[Math.floor(Math.random() * keys.length)];
-	return emojis[random as keyof typeof emojis];
+	const key = plantEmojiKeys[Math.floor(Math.random() * plantEmojiKeys.length)];
+	return emojis[key];
 }

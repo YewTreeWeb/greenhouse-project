@@ -17,7 +17,8 @@
 			"!**/coverage",
 			"!**/*.lock",
 			"!**/pnpm-lock.yaml",
-			"!**/oclif.manifest.json"
+			"!**/oclif.manifest.json",
+			"!**/tools/oxlint/anti-slop"
 		]
 	},
 	"formatter": {

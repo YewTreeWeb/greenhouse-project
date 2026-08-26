@@ -5,6 +5,15 @@ export type ExecResult =
 	| { ok: true; stdout: string }
 	| { ok: false; error: string; stderr?: string; exitCode?: number };
 
+function execOutputToText(
+	value: string | unknown[] | Uint8Array | undefined,
+): string | undefined {
+	if (value === undefined) return undefined;
+	if (value instanceof Uint8Array) return Buffer.from(value).toString();
+	if (Array.isArray(value)) return value.join("\n");
+	return value;
+}
+
 export const runCommand = async (
 	command: string,
 	args: string[],
@@ -17,15 +26,15 @@ export const runCommand = async (
 		});
 		return {
 			ok: true,
-			stdout: typeof stdout === "string" ? stdout : String(stdout ?? ""),
+			stdout: execOutputToText(stdout) ?? "",
 		};
 	} catch (error) {
+		// SAFETY: caught from an execa() call, which always rejects with an ExecaError.
 		const execaError = error as ExecaError;
 		return {
 			ok: false,
 			error: formatErrorMsg(error),
-			stderr:
-				typeof execaError?.stderr === "string" ? execaError.stderr : undefined,
+			stderr: execOutputToText(execaError?.stderr),
 			exitCode: execaError?.exitCode,
 		};
 	}

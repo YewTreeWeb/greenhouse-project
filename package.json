@@ -10,8 +10,10 @@
 		"start": "pnpm --filter greenhouse start",
 		"start:dash": "pnpm --filter sunroom start",
 		"sunroom": "pnpm --filter sunroom start",
-		"lint": "biome check . && pnpm lint:sh",
 		"lint:sh": "find . -name '*.sh' -not -path '*/node_modules/*' -not -path '*/.husky/*' -exec shellcheck {} +",
+		"lint:biome": "biome check . --write --no-errors-on-unmatched",
+		"lint:oxlint": "oxlint -c oxlint.config.ts --fix",
+		"lint": "pnpm lint:biome && pnpm lint:oxlint && pnpm lint:sh",
 		"format": "biome format --write .",
 		"commit": "cz",
 		"prepare": "husky",
@@ -25,12 +27,14 @@
 		"@changesets/cli": "^3.0.1",
 		"@commitlint/cli": "^21.2.2",
 		"@commitlint/config-conventional": "^21.2.2",
+		"@oxlint/plugins": "1.80.0",
 		"@types/node": "^26.2.0",
 		"commitizen": "^4.3.2",
 		"cz-git": "^1.13.2",
 		"fallow": "^3.14.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^17.3.0",
+		"oxlint": "1.80.0",
 		"pnpm": "^10.18.3",
 		"typescript": "^5.9.3"
 	},
@@ -41,7 +45,9 @@
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx,json,jsonc}": [
-			"biome check --write --no-errors-on-unmatched"
+			"biome check --write --no-errors-on-unmatched",
+			"pnpm lint:oxlint",
+			"pnpm format"
 		],
 		"*.sh": [
 			"shellcheck"

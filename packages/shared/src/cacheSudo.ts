@@ -2,15 +2,13 @@ import { formatErrorMsg } from "./errorHandler.js";
 import { runCommand } from "./execWrapper.js";
 
 export const cacheSudo = async (): Promise<{
-	keepAlive: NodeJS.Timeout;
+	keepAlive?: NodeJS.Timeout;
 	msg: { type: "error" | "success"; text: string };
 }> => {
-	let cacheMessage = "Password cached for this session.";
 	const result = await runCommand("sudo", ["-v"], { stdio: "inherit" });
 
 	if (!result.ok) {
-		cacheMessage = formatErrorMsg(result.error);
-		throw new Error("Administrator password required to continue.");
+		return { msg: { type: "error", text: formatErrorMsg(result.error) } };
 	}
 
 	const sudoKeepAlive = setInterval(() => {
@@ -19,6 +17,6 @@ export const cacheSudo = async (): Promise<{
 
 	return {
 		keepAlive: sudoKeepAlive,
-		msg: { type: !result.ok ? "error" : "success", text: cacheMessage },
+		msg: { type: "success", text: "Password cached for this session." },
 	};
 };

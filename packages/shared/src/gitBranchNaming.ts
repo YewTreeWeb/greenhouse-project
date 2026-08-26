@@ -6,10 +6,10 @@ interface FormatOptions {
 	type?: BranchType;
 }
 
-const patterns: Record<BranchType, RegExp> = {
+const patterns = {
 	hotfix: /^HOTFIX-[a-zA-Z0-9-]+$/,
 	rch: /^RCH-[a-zA-Z0-9-]+$/,
-};
+} satisfies Record<BranchType, RegExp>;
 
 function ensurePrefix(name: string, type: BranchType): string {
 	const prefix = type.toUpperCase();
@@ -29,25 +29,18 @@ export function formatBranchName(
 	return ensurePrefix(input, type);
 }
 
-export type BranchValidationResult =
-	| boolean
-	| { error?: string; pass: boolean };
+export type BranchValidationResult = { error?: string; pass: boolean };
 
 export function isValidBranchName(
 	name: string,
 	type: BranchType,
-	debug: boolean,
-): boolean | { error?: string; pass: boolean } {
+): BranchValidationResult {
 	const notAllowed = isProtectedBranch(name) === "not-allowed";
 	const upper = name.trim().toUpperCase();
 	const pass = !notAllowed && patterns[type].test(upper);
 
-	if (debug) {
-		return {
-			pass,
-			...(notAllowed && { error: `${name} is a protected branch` }),
-		};
-	}
-
-	return pass;
+	return {
+		pass,
+		...(notAllowed && { error: `${name} is a protected branch` }),
+	};
 }

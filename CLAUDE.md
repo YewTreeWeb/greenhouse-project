@@ -38,6 +38,9 @@ Run from the repo root unless noted.
 # Install deps (pnpm workspace)
 pnpm install
 
+# Root lint (biome + shellcheck + oxlint anti-slop rules)
+pnpm lint
+
 # Run umbrella CLI in dev mode
 pnpm dev:cli
 
@@ -74,6 +77,23 @@ pnpm --filter sunroom test    # vitest run
 pnpm --filter sunroom test:unit -- --watch  # to run a single/watch test
 ```
 
+## Definition of done
+
+A code change is NOT complete — do not say "done" or stop — until ALL of these ran, in this order, for every turn that touched code:
+
+1. `caveman-review` skill
+2. `ponytail-review` skill
+3. `fallow-review` skill
+4. `pnpm lint` passes clean
+
+Fix everything each step flags before moving to the next. Fixes must be proper root-cause fixes — no inferring, no guessing, no shortcuts (no `// eslint-disable`, no type-cast silencing, no suppressions). Skipping any of the four, or claiming completion before all four are clean, is a failure to follow this file.
+
+`pnpm lint` must pass clean for the whole repo, not just the files touched this turn — pre-existing failures elsewhere in the repo still block completion and must be fixed, not scoped out.
+
+## Code research
+
+Use tokensave MCP tools (`tokensave_context`, `tokensave_search`, etc.) for codebase research and exploration instead of Explore agents.
+
 ## Architecture notes
 
 - **Umbrella/plugin dispatch**: `apps/greenhouse/package.json`'s `oclif.plugins` array lists every `@greenhouse/*` tool package as a workspace dependency. Oclif core loads each plugin's `dist/commands/` at runtime and merges them into the umbrella's command list with no prefix — that's what makes `greenhouse setup` resolve to `packages/terrarium`'s `setup` command. A package must be built (`dist/` present) before the umbrella can load its commands.
@@ -87,6 +107,6 @@ pnpm --filter sunroom test:unit -- --watch  # to run a single/watch test
   - `createDockerFile.ts`, `getRepoName.ts`, `emoji.ts` — misc scaffolding/formatting helpers.
   - Follow the existing error pattern (`formatErrorMsg` + `spinner.fail`/`failOrExit`) rather than introducing a new error-handling convention.
 - **TypeScript config**: every package's `tsconfig.json` matches the original — `strict: true`, `module`/`moduleResolution: Node16`, target `es2022`, `rootDir: src`, `outDir: dist`. Every package is ESM (`"type": "module"`), so relative imports in `.ts` files use `.js` extensions (see `gitUtils.ts` importing `./errorHandler.js`).
-- **Linting**: `apps/greenhouse` and every `packages/*` tool use `eslint-config-oclif` + `eslint-config-prettier`, ignoring whatever's in its own `.gitignore`. `apps/sunroom` uses its own ESLint flat config (`eslint-plugin-svelte`, TypeScript-ESLint) plus Prettier.
+- **Linting**: `apps/greenhouse` and every `packages/*` tool use `eslint-config-oclif` + `eslint-config-prettier`, ignoring whatever's in its own `.gitignore`. `apps/sunroom` uses its own ESLint flat config (`eslint-plugin-svelte`, TypeScript-ESLint) plus Prettier. At the repo root, `pnpm lint` also runs Oxlint (`oxlint.config.ts`) with the vendored [anti-slop](https://github.com/dmmulroy/anti-slop) plugin at `tools/oxlint/anti-slop/` (copied via the `install-anti-slop` skill, not hand-written — don't edit it directly, re-run the skill's `scripts/install.mjs --force` to update it). It flags slop patterns like unjustified type assertions, runtime `typeof` narrowing, and unsafe dictionary types across the whole workspace; both Biome and Oxlint ignore `tools/oxlint/anti-slop/` itself.
 - **Package manager**: this repo uses pnpm (`packages: [apps/*, packages/*]` in `pnpm-workspace.yaml`), and the CLI tooling is meant to be package-manager-agnostic at runtime (per `readme.md`'s stated goal), but that detection logic isn't implemented yet — don't assume it exists.
-- **Sunroom app**: standard SvelteKit 5 + Tailwind 4 skeleton (`src/routes/+page.svelte`, `+layout.svelte`), one API route stub at `src/routes/api/greenhouse.ts` (currently empty), and Vitest set up for both browser (`vitest-browser-svelte`/Playwright) and unit tests.
+- **Sunroom app**: standard SvelteKit 5 + Tailwind 4 skeleton (`src/routes/+page.svelte`, `+layout.svelte`), and Vitest set up for both browser (`vitest-browser-svelte`/Playwright) and unit tests.

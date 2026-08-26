@@ -31,24 +31,20 @@ export async function validateBranchName(
 	debug: boolean,
 ) {
 	const isValidName =
-		name === "current" || isValidBranchName(name, type, debug);
-	const isValidUpdateFrom =
-		["main", "release", "stage"].includes(updateFrom) ||
-		isValidBranchName(updateFrom, type, debug);
+		name === "current" ? { pass: true } : isValidBranchName(name, type);
+	const isValidUpdateFrom = ["main", "release", "stage"].includes(updateFrom)
+		? { pass: true }
+		: isValidBranchName(updateFrom, type);
 
-	if (!isValidationPass(isValidName) || !isValidationPass(isValidUpdateFrom)) {
-		const msg =
-			debug && typeof isValidName === "object"
-				? isValidName?.error
-				: `Invalid branch name: "${name}". Must match RCH-1234 or HOTFIX-456.`;
+	if (!isValidName.pass || !isValidUpdateFrom.pass) {
+		const msg = debug
+			? (isValidName.error ??
+				`Invalid branch name: "${name}". Must match RCH-1234 or HOTFIX-456.`)
+			: `Invalid branch name: "${name}". Must match RCH-1234 or HOTFIX-456.`;
 		spinner.fail(msg);
 
 		return "failed";
 	}
-}
-
-function isValidationPass(result: boolean | { pass: boolean }): boolean {
-	return typeof result === "boolean" ? result : result.pass;
 }
 
 export async function branchExists(

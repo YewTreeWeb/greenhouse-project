@@ -14,7 +14,6 @@ import {
 } from "@clack/prompts";
 import { cacheSudo, runCommand } from "@greenhouse/shared";
 import { Args, Command, Flags } from "@oclif/core";
-import type { FlagInput } from "@oclif/core/interfaces";
 
 export default class Setup extends Command {
 	static override description =
@@ -30,7 +29,7 @@ export default class Setup extends Command {
 		}),
 	};
 
-	static override flags: FlagInput<{ [flag: string]: any }> = {
+	static override flags = {
 		shell: Flags.string({
 			char: "s",
 			description: "The shell environment to use",
@@ -119,17 +118,6 @@ export default class Setup extends Command {
 		this.isDryRun = flags.dryRun;
 		this.isDebug = flags.debug || this.devMode;
 		const introMsg = "Starting setup process.";
-
-		const defaultSettings = flags.default
-			? {
-					shell: "zsh",
-					terminal: "hyper",
-					launchers: ["raycast"],
-					node: { version: "lts", pkgManager: "pnpm" },
-					ruby: { version: "latest", gemManager: "bundler" },
-					php: { version: "latest", phpManager: "composer" },
-				}
-			: null;
 
 		if (this.devMode) {
 			intro(`${introMsg} (Development Mode)...`);
@@ -301,7 +289,7 @@ export default class Setup extends Command {
 		this.sudoKeepAlive = keepAlive;
 
 		if (msg.type === "error") {
-			log.error(msg.text);
+			this.bail(msg.text);
 		} else {
 			log.success(msg.text);
 		}

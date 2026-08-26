@@ -15,6 +15,7 @@ export const checkForChanges = async (
 		await execa("git", ["diff-index", "--quiet", "HEAD", "--"]);
 		return false; // No changes
 	} catch (error) {
+		// SAFETY: caught from an execa() call, which always rejects with an ExecaError.
 		const err = error as ExecaError;
 
 		if (err.exitCode === 1) {
