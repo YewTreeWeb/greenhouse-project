@@ -1,3 +1,2 @@
 pnpm exec lint-staged
 pnpm exec fallow fix --yes --no-create-config
-git add -u
